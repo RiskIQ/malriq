@@ -1,0 +1,19 @@
+# Python
+*\.pyc
+# Editor
+*\.sw[a-z]
+# setuptools build
+*\.egg-info
+build/
+dist/
+# test db
+*.sqlite3
+\.idea/
+*\.iml
+\.DS_Store
+*.egg
+*.zip
+local_settings.py
+venv/
+*.tar.gz
+*.json
