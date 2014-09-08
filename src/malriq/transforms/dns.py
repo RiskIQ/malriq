@@ -4,7 +4,7 @@ import os
 from canari.maltego.entities import IPv4Address, DNSName, Domain, URL
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
-from common.entities import IncidentEntity
+from common.entities import PDNSEntity
 
 from riskiq import api
 
@@ -40,12 +40,11 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
 TODO: set the appropriate configuration parameters for your transform.
 """
 @configure(
-    label='To RiskIQ IncidentEntity [Incident]',
-    description='Returns a list of incidents from RiskIQ',
-    uuids=['malriq.v2.MalriqEntityToIncident'],
+    label='To RiskIQ PDNSEntity [RiskIQ Passive DNS]',
+    description='Returns passive DNS entries from RiskIQ',
+    uuids=['malriq.v2.MalriqEntityToPDNS'],
     inputs=[
-        ('Malriq', Domain), ('Malriq', URL), ('Malriq', DNSName), 
-        ('Malriq', IPv4Address),
+        ('Malriq', Domain), ('Malriq', IPv4Address),
     ],
     remote=False,
     debug=True,
@@ -66,17 +65,27 @@ def dotransform(request, response, config):
     The response object is a container for output entities, UI messages, and exception messages. The config object
     contains a key-value store of the configuration file.
     TODO: write your data mining logic below.
-    """
-    token = config['riskiq_api_credentials/token']
-    secret = config['riskiq_api_credentials/private_key']
-    if not (token and secret):
-        raise ValueError('Please input RiskIQ API creds in ~/.canari/malriq.conf')
-    client = api.Client(token, secret)
+
+    # Report transform progress
     prog = 10
     progress(prog)
+    # Send a debugging message to the Maltego UI console
     debug('Starting RiskIQ incident lookup...')
+    debug('entities:')
+    debug(str(request.entities))
+    debug('vars:')
+    debug(str(vars(request.entities[0])))
     url = request.entities[0].value
-    api_response = client.get_blacklist_incident(url)
+    config = {}
+    execfile(os.path.join(os.getenv('HOME'), '.creds.py'), config)
+    creds = config['api_creds']['testing']
+    debug(str(vars(request.entities[0])))
+    url = request.entities[0].value
+    config = {}
+    execfile(os.path.join(os.getenv('HOME'), '.creds.py'), config)
+    creds = config['api_creds']['testing']
+    client = api.Client(creds['token'], creds['private_key'])
+    api_response = client.
     incidents = [x['resource'] for x in api_response['incident']]
     prog += 10
     progress(prog)
@@ -101,6 +110,9 @@ def dotransform(request, response, config):
         prog += prog_inc
         progress(prog)
     progress(100)
+    """
+    debug(str(config))
+    debug(str(vars(config)))
     return response
 
 

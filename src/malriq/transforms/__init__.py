@@ -14,4 +14,5 @@ __all__ = [
     'common',
     'helloworld',
     'incident',
+    'dns',
 ]
