@@ -85,7 +85,11 @@ def dotransform(request, response, config):
         dns_responses |= set(dns_list)
     prog += 40
     progress(prog)
-    for dom in dns_responses:
+    for _dom in dns_responses:
+        if _dom.endswith('.'):
+            dom = _dom[:-1]
+        else:
+            dom = _dom
         if IP_REGEX.match(dom):
             e = IPv4Address(dom)
             e.ip = dom
