@@ -88,15 +88,18 @@ def dotransform(request, response, config):
         return response
     prog_inc = total / len(incidents)
     for inc in incidents:
-        e = IncidentEntity(inc['url'])
-        e.url = inc['url']
-        e.ip = inc['ip']
-        e.score = inc['score']
-        e.rank = inc['rank']
-        e.phishing = inc['phishing']
-        e.malware = inc['malware']
-        e.spam = inc['spam']
-        response += e
+        ie = IncidentEntity(inc['ip'])
+        ie.url = inc['url']
+        ie.ip = inc['ip']
+        ie.score = inc['score']
+        ie.rank = inc['rank']
+        ie.phishing = inc['phishing']
+        ie.malware = inc['malware']
+        ie.spam = inc['spam']
+        response += ie
+        ue = URL(inc['ip'])
+        ue.url = inc['url']
+        response += ue
         prog += prog_inc
         progress(prog)
     progress(100)
