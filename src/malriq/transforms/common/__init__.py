@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+from riskiq import api
 
 __author__ = 'Johan Nestaas'
 __copyright__ = 'Copyright 2014, Malriq Project'

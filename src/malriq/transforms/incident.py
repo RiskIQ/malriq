@@ -7,8 +7,6 @@ from canari.framework import configure #, superuser
 from common import IP_REGEX, get_client
 from common.entities import IncidentEntity
 
-from riskiq import api
-
 __author__ = 'Johan Nestaas'
 __copyright__ = 'Copyright 2014, Malriq Project'
 __credits__ = []
