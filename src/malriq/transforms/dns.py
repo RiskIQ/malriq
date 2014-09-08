@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 import os
+import re
 
 from canari.maltego.entities import IPv4Address, DNSName, Domain, URL
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
-from common.entities import PDNSEntity
+#from common.entities import PDNSEntity
+from common import IP_REGEX, get_client
 
 from riskiq import api
 
@@ -39,12 +41,13 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
     - remote:       Whether or not the transform can be used as a remote transform in Plume.
 TODO: set the appropriate configuration parameters for your transform.
 """
+
 @configure(
     label='To RiskIQ PDNSEntity [RiskIQ Passive DNS]',
     description='Returns passive DNS entries from RiskIQ',
-    uuids=['malriq.v2.MalriqEntityToPDNS'],
+    uuids=['malriq.v2.DomainToPDNS', 'malriq.v2.IPv4ToPDNS'],
     inputs=[
-        ('Malriq', Domain), ('Malriq', IPv4Address),
+        ('RiskIQ', Domain), ('RiskIQ', IPv4Address),
     ],
     remote=False,
     debug=True,
@@ -65,56 +68,35 @@ def dotransform(request, response, config):
     The response object is a container for output entities, UI messages, and exception messages. The config object
     contains a key-value store of the configuration file.
     TODO: write your data mining logic below.
-
-    # Report transform progress
+    """
+    client = get_client(config)
     prog = 10
     progress(prog)
-    # Send a debugging message to the Maltego UI console
-    debug('Starting RiskIQ incident lookup...')
-    debug('entities:')
-    debug(str(request.entities))
-    debug('vars:')
-    debug(str(vars(request.entities[0])))
-    url = request.entities[0].value
-    config = {}
-    execfile(os.path.join(os.getenv('HOME'), '.creds.py'), config)
-    creds = config['api_creds']['testing']
-    debug(str(vars(request.entities[0])))
-    url = request.entities[0].value
-    config = {}
-    execfile(os.path.join(os.getenv('HOME'), '.creds.py'), config)
-    creds = config['api_creds']['testing']
-    client = api.Client(creds['token'], creds['private_key'])
-    api_response = client.
-    incidents = [x['resource'] for x in api_response['incident']]
-    prog += 10
-    progress(prog)
-    total = 80 - prog
-    if not incidents:
+    debug('Starting RiskIQ passive dns lookup...')
+    value = request.entities[0].value
+    if IP_REGEX.match(value):
+        api_response = client.get_dns_ptr_by_ip(value, rrtype=None)
+    else:
+        api_response = client.get_dns_data_by_name(value, rrtype=None)
+    if not api_response:
         progress(100)
         return response
-    prog_inc = total / len(incidents)
-    for inc in incidents:
-        ie = IncidentEntity(inc['ip'])
-        ie.url = inc['url']
-        ie.ip = inc['ip']
-        ie.score = inc['score']
-        ie.rank = inc['rank']
-        ie.phishing = inc['phishing']
-        ie.malware = inc['malware']
-        ie.spam = inc['spam']
-        response += ie
-        ue = URL(inc['ip'])
-        ue.url = inc['url']
-        response += ue
-        prog += prog_inc
-        progress(prog)
+    dns_lists = [x['data'] for x in api_response['records']]
+    dns_responses = set()
+    for dns_list in dns_lists:
+        dns_responses |= set(dns_list)
+    prog += 40
+    progress(prog)
+    for dom in dns_responses:
+        if IP_REGEX.match(dom):
+            e = IPv4Address(dom)
+            e.ip = dom
+        else:
+            e = Domain(dom)
+            e.fqdn = dom
+        response += e
     progress(100)
-    """
-    debug(str(config))
-    debug(str(vars(config)))
     return response
-
 
 """
 Called if transform interrupted. It's presence is optional; you can remove this function if you don't need to do any

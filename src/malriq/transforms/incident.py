@@ -4,6 +4,7 @@ import os
 from canari.maltego.entities import IPv4Address, DNSName, Domain, URL
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
+from common import IP_REGEX, get_client
 from common.entities import IncidentEntity
 
 from riskiq import api
@@ -37,15 +38,15 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
                     of, and the second item is the input entity type.
     - debug:        Whether or not the debugging window should appear in Maltego's UI when running the transform.
     - remote:       Whether or not the transform can be used as a remote transform in Plume.
-TODO: set the appropriate configuration parameters for your transform.
+ODO: set the appropriate configuration parameters for your transform.
 """
 @configure(
     label='To RiskIQ IncidentEntity [Incident]',
     description='Returns a list of incidents from RiskIQ',
-    uuids=['malriq.v2.MalriqEntityToIncident'],
+    uuids=['malriq.v2.DomainToIncident', 'malriq.v2.URLToIncident',
+           'malriq.v2.IPv4ToIncident'],
     inputs=[
-        ('Malriq', Domain), ('Malriq', URL), ('Malriq', DNSName), 
-        ('Malriq', IPv4Address),
+        ('RiskIQ', Domain), ('RiskIQ', URL), ('RiskIQ', IPv4Address),
     ],
     remote=False,
     debug=True,
@@ -67,11 +68,7 @@ def dotransform(request, response, config):
     contains a key-value store of the configuration file.
     TODO: write your data mining logic below.
     """
-    token = config['riskiq_api_credentials/token']
-    secret = config['riskiq_api_credentials/private_key']
-    if not (token and secret):
-        raise ValueError('Please input RiskIQ API creds in ~/.canari/malriq.conf')
-    client = api.Client(token, secret)
+    client = get_client(config)
     prog = 10
     progress(prog)
     debug('Starting RiskIQ incident lookup...')
@@ -86,18 +83,24 @@ def dotransform(request, response, config):
         return response
     prog_inc = total / len(incidents)
     for inc in incidents:
-        ie = IncidentEntity(inc['ip'])
-        ie.url = inc['url']
-        ie.ip = inc['ip']
-        ie.score = inc['score']
-        ie.rank = inc['rank']
-        ie.phishing = inc['phishing']
-        ie.malware = inc['malware']
-        ie.spam = inc['spam']
-        response += ie
-        ue = URL(inc['ip'])
-        ue.url = inc['url']
-        response += ue
+        if inc.get('ip') or inc.get('url'):
+            if IP_REGEX.match(inc.get('ip', '')):   
+                ipe = IPv4Address(inc['ip'])
+                ipe.ip = inc['ip']
+                response += ipe
+            if inc.get('url') and not IP_REGEX.match(inc['url']):
+                urle = URL(inc['url'])
+                urle.url = inc['url']
+                response += urle
+            ie = IncidentEntity(inc.get('ip') or inc.get('url'))
+            ie.url = inc.get('url', '')
+            ie.ip = inc.get('ip', '')
+            ie.score = inc.get('score', -1)
+            ie.rank = inc.get('rank', -1)
+            ie.phishing = inc.get('phishing', False)
+            ie.malware = inc.get('malware', False)
+            ie.spam = inc.get('spam', False)
+            response += ie
         prog += prog_inc
         progress(prog)
     progress(100)
