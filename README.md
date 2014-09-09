@@ -1,17 +1,22 @@
-# README - malriq, RiskIQ Maltego transforms
+# README
+
+## malriq, Maltego RiskIQ transforms
+
+Make RiskIQ API calls to generate new nodes.
 
 ## Installation
 
-### Install dependencies
+#### Install dependencies
+
 ```bash
 $ sudo pip install riskiq
 $ sudo python setup.py install
 
-### Set up credentials
+#### Set up credentials
 * Open ~/.canari/malriq.conf
 * Input token and private key from creds from RiskIQ API token/key generated through web UI
 
-### Install transforms
+#### Install transforms
 * Open Maltego
 * Click main icon at top left, with 3 circles
 * Go to Import->Import Configuration
@@ -20,7 +25,7 @@ $ sudo python setup.py install
 * Select Transforms + Transform Sets
 * Click Next, then Finish
 
-### Try it
+#### Try it
 * Right click any Domain, IP or URL
 * Select Run Transform->RiskIQ-> Any available imported transform
 * If no results are generated, no results found in API response
