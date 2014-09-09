@@ -8,9 +8,9 @@ Make RiskIQ API calls to generate new nodes.
 
 #### Install dependencies
 
-```bash
-$ sudo pip install riskiq
-$ sudo python setup.py install
+:::bash
+sudo pip install riskiq
+sudo python setup.py install
 
 #### Set up credentials
 * Open ~/.canari/malriq.conf
