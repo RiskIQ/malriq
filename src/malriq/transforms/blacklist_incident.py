@@ -4,7 +4,7 @@ import os
 from canari.maltego.entities import IPv4Address, DNSName, Domain, URL
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
-from common import IP_REGEX, get_client
+from common import get_client, incident_children
 from common.entities import IncidentEntity
 
 __author__ = 'Johan Nestaas'
@@ -41,10 +41,9 @@ ODO: set the appropriate configuration parameters for your transform.
 @configure(
     label='To RiskIQ Incidents [Incident, Domain, URL, IPv4]',
     description='Returns a list of incidents from RiskIQ',
-    uuids=['malriq.v2.DomainToIncident', 'malriq.v2.URLToIncident',
-           'malriq.v2.IPv4ToIncident'],
+    uuids=['malriq.v2.DomainToIncident', 'malriq.v2.IPv4ToIncident'],
     inputs=[
-        ('RiskIQ', Domain), ('RiskIQ', URL), ('RiskIQ', IPv4Address),
+        ('RiskIQ', Domain), ('RiskIQ', IPv4Address),
     ],
     remote=False,
     debug=True,
@@ -67,43 +66,17 @@ def dotransform(request, response, config):
     TODO: write your data mining logic below.
     """
     client = get_client(config)
-    prog = 10
-    progress(prog)
+    progress(10)
     debug('Starting RiskIQ incident lookup...')
     url = request.entities[0].value
     api_response = client.get_blacklist_incident(url)
     incidents = [x['resource'] for x in api_response['incident']]
-    prog += 10
-    progress(prog)
-    total = 80 - prog
-    if not incidents:
-        progress(100)
-        return response
-    prog_inc = total / len(incidents)
+    progress(20)
     for inc in incidents:
-        if inc.get('ip') or inc.get('url'):
-            if IP_REGEX.match(inc.get('ip', '')):   
-                ipe = IPv4Address(inc['ip'])
-                ipe.ip = inc['ip']
-                response += ipe
-            if inc.get('url') and not IP_REGEX.match(inc['url']):
-                urle = URL(inc['url'])
-                urle.url = inc['url']
-                response += urle
-            ie = IncidentEntity(inc.get('ip') or inc.get('url'))
-            ie.url = inc.get('url', '')
-            ie.ip = inc.get('ip', '')
-            ie.score = inc.get('score', -1)
-            ie.rank = inc.get('rank', -1)
-            ie.phishing = inc.get('phishing', False)
-            ie.malware = inc.get('malware', False)
-            ie.spam = inc.get('spam', False)
-            response += ie
-        prog += prog_inc
-        progress(prog)
+        for ent in incident_children(inc):
+            response += ent
     progress(100)
     return response
-
 
 """
 Called if transform interrupted. It's presence is optional; you can remove this function if you don't need to do any

@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 import os
-import re
 
-from canari.maltego.entities import IPv4Address, DNSName, Domain, URL, MXRecord, NSRecord#, IPv6Address
+from canari.maltego.entities import IPv4Address, DNSName, Domain, URL
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
-#from common.entities import PDNSEntity
-from common import IP_REGEX, get_client, fix_dom
+from common import get_client, incident_children
 
 __author__ = 'Johan Nestaas'
 __copyright__ = 'Copyright 2014, Malriq Project'
@@ -37,15 +35,14 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
                     of, and the second item is the input entity type.
     - debug:        Whether or not the debugging window should appear in Maltego's UI when running the transform.
     - remote:       Whether or not the transform can be used as a remote transform in Plume.
-TODO: set the appropriate configuration parameters for your transform.
+ODO: set the appropriate configuration parameters for your transform.
 """
-
 @configure(
-    label='To RiskIQ passive DNS records [DNS Records]',
-    description='Returns passive DNS records from RiskIQ',
-    uuids=['malriq.v2.DomainToPDNS', 'malriq.v2.IPv4ToPDNS'],
+    label='To RiskIQ Incidents [Incident, Domain, URL, IPv4]',
+    description='Returns a list of incidents from RiskIQ',
+    uuids=['malriq.v2.URLToIncident', 'malriq.v2.IPv4ToIncident'],
     inputs=[
-        ('RiskIQ', Domain), ('RiskIQ', IPv4Address),
+        ('RiskIQ', URL),
     ],
     remote=False,
     debug=True,
@@ -70,86 +67,19 @@ def dotransform(request, response, config):
     client = get_client(config)
     prog = 10
     progress(prog)
-    debug('Starting RiskIQ passive dns lookup...')
-    value = request.entities[0].value
-    if IP_REGEX.match(value):
-        api_response = client.get_dns_ptr_by_ip(value, rrtype=None)
-    else:
-        api_response = client.get_dns_data_by_name(value, rrtype=None)
-    if not api_response:
+    debug('Starting RiskIQ blacklist lookup...')
+    url = request.entities[0].value
+    inc = client.get_blacklist_lookup(url)
+    prog += 10
+    progress(prog)
+    if not inc:
         progress(100)
         return response
-    dns_data = api_response['records']
-    a_responses = set()
-    ns_responses = set()
-    mx_responses = set()
-    aaaa_responses = set()
-    cname_responses = set()
-    responses = set()
-    for dns_datum in dns_data:
-        data = dns_datum['data']
-        if dns_datum.get('rrtype') == 'A':
-            a_responses |= set(data)
-        elif dns_datum.get('rrtype') == 'CNAME':
-            cname_responses |= set(data)
-        elif dns_datum.get('rrtype') == 'NS':
-            ns_responses |= set(data)
-        elif dns_datum.get('rrtype') == 'MX':
-            mx_responses |= set(data)
-        elif dns_datum.get('rrtype') == 'AAAA':
-            aaaa_responses |= set(data)
-        elif dns_datum.get('rrtype') == 'TXT':
-            pass
-        else:
-            responses |= set(data)
-    prog += 40
-    progress(prog)
-    for rec in a_responses:
-        e = IPv4Address(rec)
-        e.ip = rec
-        response += e
-    prog += 10
-    progress(prog)
-    """
-    for rec in aaaa_responses:
-        e = IPv6Address(rec)
-        e.ip = rec
-        response += e
-    prog += 10
-    progress(prog)
-    """
-    for _rec in ns_responses:
-        rec = fix_dom(_rec)
-        e = NSRecord(rec)
-        e.fqdn = rec
-        response += e
-    prog += 10
-    progress(prog)
-    for _rec in mx_responses:
-        rec = fix_dom(_rec)
-        e = MXRecord(rec)
-        e.fqdn = rec
-        response += e
-    prog += 10
-    progress(prog)
-    for _rec in cname_responses:
-        rec = fix_dom(_rec)
-        e = Domain(rec)
-        e.fqdn = rec
-        response += e
-    prog += 10
-    progress(prog)
-    for _rec in responses:
-        rec = fix_dom(_rec)
-        if IP_REGEX.match(rec):
-            e = IPv4Address(rec)
-            e.ip = rec
-        else:
-            e = Domain(rec)
-            e.fqdn = rec
-        response += e
+    for ent in incident_children(inc):
+        response += ent
     progress(100)
     return response
+
 
 """
 Called if transform interrupted. It's presence is optional; you can remove this function if you don't need to do any

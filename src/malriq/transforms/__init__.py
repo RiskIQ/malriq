@@ -12,6 +12,7 @@ __status__ = 'Development'
 
 __all__ = [
     'common',
-    'incident',
+    'blacklist_incident',
     'dns',
+    'blacklist_lookup',
 ]

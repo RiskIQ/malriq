@@ -46,6 +46,8 @@ TODO: define as many custom fields and entity types as you wish:)
 
 @EntityField(name='malriq.url', propname='url', displayname='URL')
 @EntityField(name='malriq.ip', propname='ip', displayname='IPv4')
+@EntityField(name='malriq.hostname', propname='hostname', displayname='Hostname')
+@EntityField(name='malriq.description', propname='description', displayname='Description')
 @EntityField(name='malriq.score', propname='score', displayname='Score', type=EntityFieldType.Integer)
 @EntityField(name='malriq.rank', propname='rank', displayname='Rank', type=EntityFieldType.Integer)
 @EntityField(name='malriq.phishing', propname='phishing', displayname='Phishing', type=EntityFieldType.Bool)
