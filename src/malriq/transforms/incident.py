@@ -39,7 +39,7 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
 ODO: set the appropriate configuration parameters for your transform.
 """
 @configure(
-    label='To RiskIQ IncidentEntity [Incident]',
+    label='To RiskIQ Incidents [Incident, Domain, URL, IPv4]',
     description='Returns a list of incidents from RiskIQ',
     uuids=['malriq.v2.DomainToIncident', 'malriq.v2.URLToIncident',
            'malriq.v2.IPv4ToIncident'],

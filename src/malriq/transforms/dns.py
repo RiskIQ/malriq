@@ -48,8 +48,8 @@ def fix_dom(rec):
         return rec
 
 @configure(
-    label='To RiskIQ PDNSEntity [RiskIQ Passive DNS]',
-    description='Returns passive DNS entries from RiskIQ',
+    label='To RiskIQ passive DNS records [DNS Records]',
+    description='Returns passive DNS records from RiskIQ',
     uuids=['malriq.v2.DomainToPDNS', 'malriq.v2.IPv4ToPDNS'],
     inputs=[
         ('RiskIQ', Domain), ('RiskIQ', IPv4Address),
