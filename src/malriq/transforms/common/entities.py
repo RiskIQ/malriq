@@ -14,7 +14,6 @@ __status__ = 'Development'
 
 __all__ = [
     'MalriqEntity',
-    'MyMalriqEntity',
     'IncidentEntity',
     'PDNSEntity',
 ]
@@ -44,15 +43,6 @@ You can specify as many entity fields as you want by just adding an extra @Entit
     - is_value: a boolean value that determines whether the field is also the default value of the entity object.
 TODO: define as many custom fields and entity types as you wish:)
 """    
-@EntityField(name='malriq.fieldN', propname='fieldN', displayname='Field N', matchingrule=MatchingRule.Loose)
-@EntityField(name='malriq.field1', propname='field1', displayname='Field 1', type=EntityFieldType.Integer)
-class MyMalriqEntity(MalriqEntity):
-    """
-    Uncomment the line below and comment out the pass if you wish to define a ridiculous entity type name like
-    'my.fancy.EntityType'
-    """
-    # _name_ = 'my.fancy.EntityType'
-    pass
 
 @EntityField(name='malriq.url', propname='url', displayname='URL')
 @EntityField(name='malriq.ip', propname='ip', displayname='IPv4')

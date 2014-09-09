@@ -2,7 +2,7 @@
 import os
 import re
 
-from canari.maltego.entities import IPv4Address, DNSName, Domain, URL
+from canari.maltego.entities import IPv4Address, DNSName, Domain, URL, MXRecord, NSRecord#, IPv6Address
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
 #from common.entities import PDNSEntity
@@ -39,6 +39,13 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
     - remote:       Whether or not the transform can be used as a remote transform in Plume.
 TODO: set the appropriate configuration parameters for your transform.
 """
+
+def fix_dom(rec):
+    ''' Remove period suffix '''
+    if rec.endswith('.'):
+        return rec[:-1]
+    else:
+        return rec
 
 @configure(
     label='To RiskIQ PDNSEntity [RiskIQ Passive DNS]',
@@ -79,23 +86,74 @@ def dotransform(request, response, config):
     if not api_response:
         progress(100)
         return response
-    dns_lists = [x['data'] for x in api_response['records']]
-    dns_responses = set()
-    for dns_list in dns_lists:
-        dns_responses |= set(dns_list)
+    dns_data = api_response['records']
+    a_responses = set()
+    ns_responses = set()
+    mx_responses = set()
+    aaaa_responses = set()
+    cname_responses = set()
+    responses = set()
+    for dns_datum in dns_data:
+        data = dns_datum['data']
+        if dns_datum.get('rrtype') == 'A':
+            a_responses |= set(data)
+        elif dns_datum.get('rrtype') == 'CNAME':
+            cname_responses |= set(data)
+        elif dns_datum.get('rrtype') == 'NS':
+            ns_responses |= set(data)
+        elif dns_datum.get('rrtype') == 'MX':
+            mx_responses |= set(data)
+        elif dns_datum.get('rrtype') == 'AAAA':
+            aaaa_responses |= set(data)
+        elif dns_datum.get('rrtype') == 'TXT':
+            pass
+        else:
+            responses |= set(data)
     prog += 40
     progress(prog)
-    for _dom in dns_responses:
-        if _dom.endswith('.'):
-            dom = _dom[:-1]
+    for rec in a_responses:
+        e = IPv4Address(rec)
+        e.ip = rec
+        response += e
+    prog += 10
+    progress(prog)
+    """
+    for rec in aaaa_responses:
+        e = IPv6Address(rec)
+        e.ip = rec
+        response += e
+    prog += 10
+    progress(prog)
+    """
+    for _rec in ns_responses:
+        rec = fix_dom(_rec)
+        e = NSRecord(rec)
+        e.fqdn = rec
+        response += e
+    prog += 10
+    progress(prog)
+    for _rec in mx_responses:
+        rec = fix_dom(_rec)
+        e = MXRecord(rec)
+        e.fqdn = rec
+        response += e
+    prog += 10
+    progress(prog)
+    for _rec in cname_responses:
+        rec = fix_dom(_rec)
+        e = Domain(rec)
+        e.fqdn = rec
+        response += e
+    prog += 10
+    progress(prog)
+    for _rec in responses:
+        rec = fix_dom(_rec)
+        if IP_REGEX.match(rec):
+            e = IPv4Address(rec)
+            e.ip = rec
         else:
-            dom = _dom
-        if IP_REGEX.match(dom):
-            e = IPv4Address(dom)
-            e.ip = dom
-        else:
-            e = Domain(dom)
-            e.fqdn = dom
+            e = Domain(rec)
+            e.fqdn = rec
         response += e
     progress(100)
     return response

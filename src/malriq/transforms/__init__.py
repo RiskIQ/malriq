@@ -12,7 +12,6 @@ __status__ = 'Development'
 
 __all__ = [
     'common',
-    'helloworld',
     'incident',
     'dns',
 ]
