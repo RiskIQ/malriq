@@ -9,7 +9,6 @@ Make RiskIQ API calls to generate new nodes.
 #### Install dependencies
 
 ````bash
-sudo pip install riskiq
 sudo python setup.py install
 ````
 
