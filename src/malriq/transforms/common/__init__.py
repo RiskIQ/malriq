@@ -24,11 +24,8 @@ __all__ = [
 IP_REGEX = re.compile(r'^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.([0-9]{1,3}|\*|[0-9]{1,3}/[0-9]{1,2})$')
 
 def get_client(config):
-    try:
-        token = config['riskiq_api_credentials/token']
-        secret = config['riskiq_api_credentials/private_key']
-    except:
-        raise ValueError('Please input RiskIQ API creds in ~/.canari/malriq.conf')
+    token = config['riskiq_api_credentials/token']
+    secret = config['riskiq_api_credentials/private_key']
     if not (token and secret):
         raise ValueError('Please input RiskIQ API creds in ~/.canari/malriq.conf')
     return api.Client(token, secret)
