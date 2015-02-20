@@ -10,6 +10,7 @@ Make RiskIQ API calls to generate new nodes.
 
 ````bash
 sudo python setup.py install
+./generate_mtz.sh
 ````
 
 #### Set up credentials
