@@ -5,7 +5,6 @@ import re
 from canari.maltego.entities import IPv4Address, DNSName, Domain, URL, MXRecord, NSRecord#, IPv6Address
 from canari.maltego.utils import debug, progress
 from canari.framework import configure #, superuser
-#from common.entities import PDNSEntity
 from common import IP_REGEX, get_client, fix_dom
 
 __author__ = 'Johan Nestaas'

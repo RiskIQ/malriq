@@ -15,7 +15,6 @@ __status__ = 'Development'
 __all__ = [
     'MalriqEntity',
     'IncidentEntity',
-    'PDNSEntity',
 ]
 
 """
@@ -54,15 +53,6 @@ TODO: define as many custom fields and entity types as you wish:)
 @EntityField(name='malriq.malware', propname='malware', displayname='Malware', type=EntityFieldType.Bool)
 @EntityField(name='malriq.spam', propname='spam', displayname='Spam', type=EntityFieldType.Bool)
 class IncidentEntity(MalriqEntity):
-    """
-    Uncomment the line below and comment out the pass if you wish to define a ridiculous entity type name like
-    'my.fancy.EntityType'
-    """
-    # _name_ = 'my.fancy.EntityType'
-    pass
-
-@EntityField(name='malriq.ip', propname='ip', displayname='IPv4')
-class PDNSEntity(MalriqEntity):
     """
     Uncomment the line below and comment out the pass if you wish to define a ridiculous entity type name like
     'my.fancy.EntityType'
