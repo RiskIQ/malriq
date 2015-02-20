@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='malriq',
     author='Johan Nestaas',
-    version='1.0',
+    version='1.0.1',
     author_email='johan@riskiq.net',
     description='Maltego transforms integrated with RiskIQ API',
     license='GPL',
