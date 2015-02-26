@@ -25,11 +25,11 @@ canari create-profile malriq
 
 #### Install transforms
 * Open Maltego
-* Click main icon at top left, with 3 circles
-* Go to Import->Import Configuration
+* Click the Orb in the top left (the Maltego icon with three circles)
+* Select the menu item Import->Import Configuration
 * Select malriq.mtz (within the same directory as this README)
 * Click Next
-* Select Transforms + Transform Sets
+* Select both Transforms + Transform Sets
 * Click Next, then Finish
 
 #### Try it
