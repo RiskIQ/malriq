@@ -12,7 +12,7 @@ Tested with Maltego v3.5.0 and v3.5.3, and canari 1.1.
 
 ````bash
 sudo python setup.py install
-./generate_mtz.sh
+canari create-profile malriq
 # It may ask to regenerate configs in ~/.canari . If so, make sure you put back
 # your riskiq API token and private key inside ~/.canari/malriq.conf
 ````
