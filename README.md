@@ -11,7 +11,9 @@ Tested with Maltego v3.5.0 and v3.5.3, and canari 1.1.
 #### Install dependencies
 
 ````bash
-sudo python setup.py install
+# install malriq source
+python setup.py install
+# create mtz file
 canari create-profile malriq
 # It may ask to regenerate configs in ~/.canari . If so, make sure you put back
 # your riskiq API token and private key inside ~/.canari/malriq.conf
@@ -19,7 +21,7 @@ canari create-profile malriq
 
 #### Set up credentials
 * Open ~/.canari/malriq.conf
-* Input token and private key from creds from RiskIQ API token/key generated through web UI
+* Input RiskIQ credentials: token and private key
 
 #### Install transforms
 * Open Maltego
