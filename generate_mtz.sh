@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 
 canari create-profile malriq
