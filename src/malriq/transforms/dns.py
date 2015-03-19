@@ -42,9 +42,9 @@ TODO: set the appropriate configuration parameters for your transform.
 @configure(
     label='To RiskIQ passive DNS records [DNS Records]',
     description='Returns passive DNS records from RiskIQ',
-    uuids=['malriq.v2.DomainToPDNS', 'malriq.v2.IPv4ToPDNS'],
+    uuids=['malriq.v2.DomainToPDNS', 'malriq.v2.IPv4ToPDNS', 'malriq.v2.DNSNameToPDNS'],
     inputs=[
-        ('RiskIQ', Domain), ('RiskIQ', IPv4Address),
+        ('RiskIQ', Domain), ('RiskIQ', IPv4Address), ('RiskIQ', DNSName),
     ],
     remote=False,
     debug=True,
@@ -133,7 +133,7 @@ def dotransform(request, response, config):
     progress(prog)
     for _rec in cname_responses:
         rec = fix_dom(_rec)
-        e = Domain(rec)
+        e = DNSName(rec)
         e.fqdn = rec
         response += e
     prog += 10
@@ -144,7 +144,7 @@ def dotransform(request, response, config):
             e = IPv4Address(rec)
             e.ip = rec
         else:
-            e = Domain(rec)
+            e = DNSName(rec)
             e.fqdn = rec
         response += e
     progress(100)
