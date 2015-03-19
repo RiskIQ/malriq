@@ -42,7 +42,7 @@ ODO: set the appropriate configuration parameters for your transform.
     description='Returns a list of incidents from RiskIQ',
     uuids=['malriq.v2.URLToIncident', 'malriq.v2.IPv4ToIncident'],
     inputs=[
-        ('RiskIQ', URL),
+        ('RiskIQ', URL), ('RiskIQ', IPv4Address),
     ],
     remote=False,
     debug=True,
