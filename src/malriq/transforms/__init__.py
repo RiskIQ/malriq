@@ -16,4 +16,5 @@ __all__ = [
     'dns',
     'blacklist_lookup',
     'extract_url',
+    'extract_ip',
 ]

@@ -37,9 +37,9 @@ The @configure decorator tells mtginstall how to install the transform in Malteg
 ODO: set the appropriate configuration parameters for your transform.
 """
 @configure(
-    label='To URLs [Incident]',
-    description='Returns the URL associated with an incident',
-    uuids=['malriq.v2.IncidentToURL'],
+    label='To IP [Incident]',
+    description='Returns the IP associated with an incident',
+    uuids=['malriq.v2.IncidentToIP'],
     inputs=[
         ('RiskIQ', IncidentEntity)
     ],
@@ -64,9 +64,9 @@ def dotransform(request, response, config):
     TODO: write your data mining logic below.
     """
     progress(10)
-    debug('Extracting URL')
-    response += [URL(request.entities[0].fields['url'])]
-    #response += [IPv4Address(request.entities[0].fields['ip'])]
+    debug('Extracting IP')
+    #response += [URL(request.entities[0].fields['url'])]
+    response += [IPv4Address(request.entities[0].fields['ip'])]
     progress(100)
     return response
 
