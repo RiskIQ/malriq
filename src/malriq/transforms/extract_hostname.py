@@ -66,7 +66,7 @@ def dotransform(request, response, config):
     """
     progress(10)
     debug('Extracting DNSName')
-    val = fix_dom(request.entities[0].fields['malriq.hostname'])
+    val = fix_dom(request.entities[0].fields['malriq.hostname'].value)
     dnse = DNSName(val)
     dnse.fqdn = val
     response += [dnse]

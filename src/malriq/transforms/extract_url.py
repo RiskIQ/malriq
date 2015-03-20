@@ -65,7 +65,7 @@ def dotransform(request, response, config):
     """
     progress(10)
     debug('Extracting URL')
-    val = request.entities[0].fields['malriq.url']
+    val = request.entities[0].fields['malriq.url'].value
     urle = URL(val)
     urle.url = val
     response += [urle]
