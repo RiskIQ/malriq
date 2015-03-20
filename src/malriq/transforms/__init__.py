@@ -15,4 +15,7 @@ __all__ = [
     'blacklist_incident',
     'dns',
     'blacklist_lookup',
+    'extract_url',
+    'extract_ip',
+    'extract_hostname',
 ]

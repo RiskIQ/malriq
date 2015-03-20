@@ -40,19 +40,19 @@ def fix_dom(rec):
 def incident_children(inc):
     response = []
     if inc.get('ip') or inc.get('url') or inc.get('hostname'):
-        if IP_REGEX.match(inc.get('ip', '')):   
-            ipe = IPv4Address(inc['ip'])
-            ipe.ip = inc['ip']
-            response += [ipe]
-        if inc.get('url') and not IP_REGEX.match(inc['url']):
-            urle = URL(inc['url'])
-            urle.url = inc['url']
-            response += [urle]
-        if inc.get('hostname'):
-            hostname = fix_dom(inc['hostname'])
-            hoste = Domain(hostname)
-            hoste.fqdn = hostname
-            response += [hoste]
+        #if IP_REGEX.match(inc.get('ip', '')):   
+        #    ipe = IPv4Address(inc['ip'])
+        #    ipe.ip = inc['ip']
+        #    response += [ipe]
+        #if inc.get('url') and not IP_REGEX.match(inc['url']):
+        #    urle = URL(inc['url'])
+        #    urle.url = inc['url']
+        #    response += [urle]
+        #if inc.get('hostname'):
+        #    hostname = fix_dom(inc['hostname'])
+        #    hoste = DNSName(hostname)
+        #    hoste.fqdn = hostname
+        #    response += [hoste]
         ie = IncidentEntity(inc.get('url') or inc.get('ip') 
             or inc.get('hostname'))
         ie.url = inc.get('url', '')
