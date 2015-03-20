@@ -65,7 +65,7 @@ def dotransform(request, response, config):
     """
     progress(10)
     debug('Extracting URL')
-    response += [URL(request.entities[0].url)]
+    response += [URL(request.entities[0].fields.url)]
     progress(100)
     return response
 
