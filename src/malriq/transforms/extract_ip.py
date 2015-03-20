@@ -65,8 +65,10 @@ def dotransform(request, response, config):
     """
     progress(10)
     debug('Extracting IP')
-    #response += [URL(request.entities[0].fields['url'])]
-    response += [IPv4Address(request.entities[0].fields['ip'])]
+    val = request.entities[0].fields['malriq.ip']
+    ipe = IPv4Address(val)
+    ipe.ip = val
+    response += [ipe]
     progress(100)
     return response
 
